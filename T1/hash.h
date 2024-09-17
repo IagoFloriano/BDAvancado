@@ -7,7 +7,7 @@ enum status_pos_vetor {
   vazio = 0,
   cheio,
   excluido,
-}
+};
 
 typedef struct elemento {
   char *nomeHash;
@@ -43,7 +43,7 @@ int insere(t_hash *h, int valor);
 
 // Remove elemento da tabela
 // caso não esteja presente não faz nada
-void remove(int valor);
+void removeChave(t_hash *h, int valor);
 
 // Função de hash da primeira tabela
 // k mod m
@@ -55,6 +55,9 @@ int h1(int k);
 // (m = TAM_VETORES)
 int h2(int k);
 
+// Imprime (stdout) todos os elementos da hash
+// cada linha será no formato elemento,tabela(T1/T2),posicao
+// saída ordenada pelo primeiro campo, seguido pelo segundo e terceiro campos
 void imprimeOrdenado(t_hash *h);
 
 #endif //__HASH__
