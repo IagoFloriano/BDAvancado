@@ -1,0 +1,50 @@
+Nome: Iago Mello Floriano
+GRR: 20196049
+
+O objetivo do trabalho é implementar inclusão e exclusão de valores em uma tabela hash de endereçamento aberto, usando um algoritmo similar ao cuckoo hash.
+
+Nessa implementação são usadas duas tabelas de tamanho igual, sendo esse tamanho 11.
+A função hash para a tabela 1 é h1(k) = k mod m.
+A função hash para a tabela 2 é h2(k) = piso(m * (k * 0.9 - piso(k * 0.9) ) ).
+Onde m é o tamanho das tabelas (11).
+O tratamento de colisão é feito movendo chaves da tabela T1 para tabela T2.
+
+Algoritmo de busca:
+Para se procurar uma chave k, procura-se primeiro em T1 usando h1(k), caso posição calculada esteja vazia chave não existe. Caso a chave exista em T1, retorna-se a posição com h1(k). Caso não exista em T1 e exista em T2 retorna a posição em T2 com h2(k).
+
+Algoritmo de inclusão:
+Ao inserir uma chave k, a inclusão sempre é feita em T1. Caso a posição em T1 dada por h1(k) esteja vazia é feita a inclusão e posição é marcada como preenchida é finalizado o algoritmo. Caso a posição h1(k) em T1 já estiver ocupada com outra chave k' (marcada como preenchida), a chave k' é copiada para T2 na posição h2(k'), em seguida k é inserida em T1 na posição h1(k) e o algoritmo é finalizado. É considerado que não ocorrem colisões em T2.
+
+Algoritmo de exclusão:
+Ao remover uma chave k, primeiro é feito uma busca para se saber a posição dessa chave. Caso a busca não encontre a chave, nada é feito (remover um elemento que não pertence a hash é o mesmo que não fazer nada). Caso contrário, posição retornada pela busca é marcada como excluída (que é diferente de ser marcada como vazia) e algoritmo encerra.
+
+Implementação
+A implementação foi feita em C, com auxílio das bibliotecas stdio.h stdlib.h e string.h
+Em "hash.h" foram definidas 3 structs para o funcionamento.
+A struct elemento é usada conceitualmente como uma posição em uma tabela, tendo um campo para a chave (int valor), um para o nome da tabela a qual pertence (char *nomeHash), e um último campo para salvar se posição esta vazia, preenchida ou excluída (int status). Para clareza no código foi feito um enum para o campo status da struct elemento.
+A struct my_hash é usada conceitualmente para representar tanto T1 quanto T2, tendo um campo para o nome da tabela (char *nome), um campo para o tamanho (int tamanho), e um campo para os elementos da tabela (elemento *vetor). Foi implementado as posições da tabela como um vetor de elementos (a struct explicada anteriormente).
+A struct t_hash é usada para armazenar T1 e T2 para facilidade do uso como parâmetro em funções. Contém dois campos (struct my_hash *T1, e struct my_hash *T2) que armazenam as duas tabelas.
+
+Funções busca, insere, e removeChave implementam respectivamente os algoritmos de busca, inclusão e exclusão. Funções h1 e h2 implementam as funções h1(k) e h2(k) definidas anteriormente. Função inicializa é usada para alocar o espaço necessário para as duas tabelas e todas suas posições.
+Função imprimeOrdenado é usada para imprimir os elementos presentes em ambas as tabelas. Seu funcionamento é dado pela criação de um vetor temporário com tamanho 2*m. Esse vetor é então ordenado com a função qsort da biblioteca stdlib.h, a ordenação é feita primeiramente pela chave, em seguida pelo nome da tabela e por último por sua posição em T1 ou T2. Impressão é feita com uma linha para cada chave, sendo cada linha no formato chave,nome da tabela,posição.
+
+Arquivo myht.c é usado como exemplo de como devem ser usados os arquivos hash.h e hash.c. Seu funcionamento é feito primeiramente criando uma tabela e usando a função de inicialização. Em seguida são lidas linhas da entrada padrão (stdin) com comando de inserção ou remoção, comandos devem estar no formato `comando chave\n` sendo comando a letra `i` para inserção ou `r` para remoção, e `chave` a chave que se deseja inserir ou remover. Leitura acontece até o fim de um arquivo (leitura de EOF), ao final da leitura é feita a impressão das tabelas usando a função imprimeOrdenado.
+
+Exemplo de entrada e saída:
+entrada:
+i 10
+i 22
+i 4
+i 15
+i 59
+r 15
+r 22
+r 59
+EOF
+
+saída:
+4,T2,6
+10,T1,10
+
+Compilação do programa:
+Foi incluído o arquivo makefile, portanto é apenas necessário rodar o comando `make` e será gerado o executável `myht`.
