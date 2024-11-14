@@ -1,4 +1,5 @@
 *.o
 */myht
+*/mydht
 *.in
 *.out
