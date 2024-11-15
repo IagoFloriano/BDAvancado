@@ -1,0 +1,67 @@
+Nome: Iago Mello Floriano
+GRR: 20196049
+
+O objetivo do trabalho é implementar entrada e saída de nós, inclusão e lookup de chaves em uma tabela hash distribuída.
+
+Nessa implementação é usado uma lista circular duplamente encadeada de nós.
+A estrutura que acessa essa lista também salva os seguintes valores:
+- Um inteiro m, usado para definir o tamanho das finger tables de cada nó.
+- Um inteiro qtdNodos, usado para definir quantos nós estão presentes na lista, importante para quando se for remover o último nó.
+- Um inteiro maiorId, usado para ver quando é necessário atualizar o valor de m.
+
+Cada nó contém os seguintes valores:
+- Um inteiro id, usado como identificador único para cada nó.
+- Um vetor chaves, usado para armazenar as chaves que foram inseridas nesse nó.
+- Um inteiro qtdChaves, usado para saber quantas chaves o nó tem armazenado.
+- Um ponteiro para o nó anterior e para o seguinte, isso para poder ser implementada uma lista circular.
+- Um vetor de inteiros numEntrada e um vetor de nós nos, usados como a finger table.
+
+Algoritmo de entrada de nós:
+Primeiro é feita uma verificação se o valor de m da tabela deve ser atualizado. Em seguida é inserido o novo nó na lista duplamente encadeada, isso simulando o que um nó de bootstrap faria. Então se atualiza todas a finger tables da tabela. E por último o novo nó pega as chaves com valor menor que seu id do nó seguinte a ele.
+
+Algoritmo de saída de nós:
+Primeiro, busca-se o nó e remove-o da lista duplamente encadeada. Atualiza-se o m da tabela caso o nó com maior id tenha sido removido. Após isso, passa todas as suas chaves para o nó seguinte na lista.
+
+Algoritmo de lookup:
+Ao buscar por uma chave a partir de um nó, é usada a finger table desse nó para saber qual deve ser o seguinte nó a ser consultado caso a chave não esteja no nó que iniciou o lookup. Ao final disso é possível saber qual nó tem a chave desejada (ou deveria ter, caso não tenha).
+
+Algoritmo de inclusão de chaves:
+É utilizado o algoritmo de lookup para poder saber qual nó deve ter essa nova chave salva, então salva-se a chave.
+
+
+Implementação
+A implementação foi feita em C, com auxílio das bibliotecas stdio.h stdlib.h, string.h e math.
+Implementação foi feita em apenas um arquivo tendo uma função para cada algoritmo descrito anteriormente, duas structs, uma para os nós e outra para a lista encadeada. Também foram implementadas algumas funções para facilitar o desenvolvimento das funções principais.
+
+Na função main é implementado a leitura da linha de comando para que o usuário possa fazer com que cada um dos algoritmos descritos anteriormente executem com qualquer valor desejado. A leitura é feita pelo stdin e ao fazer lookup é gerado uma saída em stdout
+
+Exemplo de entrada e saída:
+entrada:
+1 E 4 -
+2 E 10 -
+3 I 10 18
+4 E 20 -
+5 E 14 -
+6 S 4 -
+7 E 28 -
+8 L 10 18
+9 E 1 -
+10 E 56 -
+11 I 1 50
+12 S 56 -
+13 E 52 -
+14 E 42 -
+15 L 10 50
+EOF
+
+saída:
+8 L 18 {10,20}
+8 T 10 {14,14,14,20,28}
+8 T 20 {28,28,28,28,10}
+15 L 50 {10,42,52}
+15 T 10 {14,14,14,20,28,42}
+15 T 42 {52,52,52,52,1,10}
+15 T 52 {1,1,1,1,10,20}
+
+Compilação do programa:
+Foi incluído o arquivo makefile, portanto é apenas necessário rodar o comando `make` e será gerado o executável `mydht`.

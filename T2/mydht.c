@@ -5,6 +5,7 @@
 
 #define MAXCHAVES 100
 #define MAX_LINE_CHARS 20
+#define MAX_M 20
 
 typedef struct nodo {
   int id;
@@ -47,9 +48,6 @@ int noValidoFt(int idNo, int idPrev, int entrada) {
 }
 
 void atualizaFT(nodo *no, int m) {
-  no->numEntrada = realloc(no->numEntrada, sizeof(int)*m);
-  no->nos = realloc(no->nos, sizeof(nodo)*m);
-
   nodo *atual = no->prox;
   for (int i = 0; i < m; i++) {
     no->numEntrada[i] = (no->id + (int)pow(2, i)) % (int)pow(2,m);
@@ -73,7 +71,7 @@ void entrar(dht *t, int idNo) {
   // Verifica se m deve ser atualizado
   if (idNo > t->maiorId) {
     t->maiorId = idNo;
-    if ( idNo >= pow(2, t->m+1) ) {
+    if ( idNo >= pow(2, t->m) ) {
       t->m = log2(t->maiorId) + 1;
     }
   }
@@ -84,6 +82,8 @@ void entrar(dht *t, int idNo) {
   novoNo->id = idNo;
   novoNo->chaves = malloc(sizeof(int) * MAXCHAVES);
   novoNo->qtdChaves = 0;
+  novoNo->numEntrada = malloc(sizeof(int)*MAX_M);
+  novoNo->nos = malloc(sizeof(nodo)*MAX_M);
 
   // Insere o no no anel
   if (t->tree == NULL) {
@@ -253,8 +253,10 @@ nodo *lookup(dht *t, int idNo, int chave, int timestamp, int print) {
 void inclusao(dht *t, int idNo, int chave) {
   nodo *no = lookup(t, idNo, chave, 0, 0);
   // Insere a chave
+  no->chaves[no->qtdChaves++] = chave;
 
   // Ordena chaves
+  qsort(no->chaves, no->qtdChaves, sizeof(int), comp);
 }
 
 int main(){
@@ -285,17 +287,9 @@ int main(){
         sair(&hash, idNo);
         break;
       case 'I':
+        inclusao(&hash, idNo, chave);
         break;
       case 'L':
-        printf("-----------\n");
-        nodo *no = hash.tree;
-        printNodeFT(no, hash.m, timestamp);
-        no = no->prox;
-        while (no != hash.tree) {
-          printNodeFT(no, hash.m, timestamp);
-          no = no->prox;
-        }
-        printf("-----------\n");
         lookup(&hash, idNo, chave, timestamp, 1);
         break;
       default:
