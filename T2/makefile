@@ -1,5 +1,7 @@
 CFLAGS = -Wall -Werror
+LIBS = -lm
 
 all: mydht
 
-myht: mydht.c
+mydht: mydht.c
+	gcc -o $@ $^ $(LIBS)
